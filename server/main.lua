@@ -56,7 +56,13 @@ function GenerateVehicleDataAndContextFromQueryResult(dbResults, garageKey)
         for i = 1, #dbResults do
             local dbResult = dbResults[i]
             dbResult.vehicle = json.decode(dbResult.vehicle)
-
+            local metadata = json.decode(dbResult.metadata)
+            if metadata?.groupGrade then
+                if not metadata.groupGrade <= ESX.GetPlayerFromId(source).job.grade then
+                    goto skipLoop
+                end
+            end
+            
             if not dbResult.model and dbResult.vehicle?.model then -- probably just migrated from esx-legacy therefore dbResult.model is empty...
                 for vModel, vData in pairs(ESX.GetVehicleData()) do
                     if vData.hash == dbResult.vehicle.model then
